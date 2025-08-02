@@ -3,19 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <title>Edit Entry</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .edit-container {
+            max-width: 500px;
+            margin: 48px auto;
+            padding: 32px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.10);
+        }
+        .edit-container h2 {
+            font-size: 2em;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+        .edit-container form {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        .edit-container label {
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 1.15em;
+        }
+        .edit-container input[type="date"],
+        .edit-container input[type="number"],
+        .edit-container input[type="text"] {
+            padding: 14px 12px;
+            border: 1.5px solid #ccc;
+            border-radius: 6px;
+            font-size: 1.15em;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .edit-actions {
+            display: flex;
+            gap: 16px;
+        }
+        .edit-actions button,
+        .edit-actions a {
+            font-size: 1.15em;
+            padding: 14px 0;
+            border-radius: 6px;
+        }
+        @media (max-width: 600px) {
+            .edit-container {
+                max-width: 98vw;
+                padding: 12px;
+            }
+            .edit-actions {
+                flex-direction: column;
+            }
+            .edit-actions button,
+            .edit-actions a {
+                width: 100%;
+                box-sizing: border-box;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h2>Edit Entry</h2>
-    <form method="post">
-        <label>Date:</label>
-        <input type="date" name="date" value="{{ entry.date }}" required>
-        <label>Amount:</label>
-        <input type="number" name="amount" step="0.01" value="{{ entry.amount }}" required>
-        <label>Comments:</label>
-        <input type="text" name="comments" value="{{ entry.comments }}">
-        <button type="submit">Save</button>
-        <a href="{{ url_for('index') }}" class="btn-blue">Cancel</a>
-    </form>
+    <div class="edit-container">
+        <h2>Edit Entry</h2>
+        <form method="post">
+            <div>
+                <label>Date:</label>
+                <input type="date" name="date" value="{{ entry.date }}" required>
+            </div>
+            <div>
+                <label>Amount:</label>
+                <input type="number" name="amount" step="0.01" value="{{ entry.amount }}" required>
+            </div>
+            <div>
+                <label>Comments:</label>
+                <input type="text" name="comments" value="{{ entry.comments }}">
+            </div>
+            <div class="edit-actions">
+                <button type="submit" class="btn-blue">Save</button>
+                <a href="{{ url_for('index') }}" class="btn-blue" style="text-align:center;">Cancel</a>
+            </div>
+        </form>
+    </div>
 </body>
 </html>

@@ -19,7 +19,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Company Finance Dashboard</h1>
+        <h1>Paprotka Finance</h1>
         <div style="margin-bottom: 1em; display: flex; align-items: center; gap: 1em;">
             {% if view == 'year' %}
                 <form method="get" action="{{ url_for('index') }}" style="display:inline;">
@@ -87,7 +87,7 @@
                 <tbody>
                     {% for entry in entries %}
                     <tr>
-                        <td>{{ entry.date }}</td>
+                        <td>{{ entry.date|datetimeformat }}</td>
                         <td>{{ entry.amount }}</td>
                         <td>{{ entry.comments }}</td>
                         <td>

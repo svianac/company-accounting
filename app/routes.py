@@ -3,6 +3,7 @@ from . import app
 import json
 import os
 from datetime import datetime
+from flask import Flask
 
 DATA_FILE = os.path.join(os.path.dirname(__file__), '..', 'data.json')
 
@@ -85,8 +86,8 @@ def index():
     else:
         summary = get_monthly_summary(entries, year, month)
         filtered_entries = filter_month(entries, year, month)
-    # Sort entries by date descending (most recent first)
-    filtered_entries.sort(key=lambda e: e['date'], reverse=True)
+    # Sort entries by date ascending (oldest first)
+    filtered_entries.sort(key=lambda e: e['date'])
     return render_template('index.html', entries=filtered_entries, summary=summary, year=year, month=month, view=view)
 
 @app.route('/add', methods=['POST'])
@@ -127,3 +128,9 @@ def delete_entry(idx):
         entries.pop(idx)
         save_entries(entries)
     return redirect(url_for('index'))
+
+@app.template_filter('datetimeformat')
+def datetimeformat(value):
+    if isinstance(value, str):
+        value = datetime.strptime(value, "%Y-%m-%d")
+    return value.strftime("%d %b %Y")
