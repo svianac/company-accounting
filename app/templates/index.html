@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Company Finance Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .summary-positive { color: #2ecc40; font-weight: bold; }
+        .summary-negative { color: #e74c3c; font-weight: bold; }
+        .tabs { display: flex; margin-bottom: 1em; }
+        .tab { flex: 1; padding: 10px; cursor: pointer; background: #eee; text-align: center; }
+        .tab.active { background: #ddd; font-weight: bold; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .entry-group { margin-bottom: 1em; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Company Finance Dashboard</h1>
+        <div style="margin-bottom: 1em; display: flex; align-items: center; gap: 1em;">
+            {% if view == 'year' %}
+                <form method="get" action="{{ url_for('index') }}" style="display:inline;">
+                    <input type="hidden" name="year" value="{{ year - 1 }}">
+                    <input type="hidden" name="view" value="year">
+                    <button type="submit">&lt; Previous</button>
+                </form>
+                <span style="font-weight:bold;">{{ summary.month }}</span>
+                <form method="get" action="{{ url_for('index') }}" style="display:inline;">
+                    <input type="hidden" name="year" value="{{ year + 1 }}">
+                    <input type="hidden" name="view" value="year">
+                    <button type="submit">Next &gt;</button>
+                </form>
+                <form method="get" action="{{ url_for('index') }}" style="display:inline;">
+                    <input type="hidden" name="year" value="{{ year }}">
+                    <input type="hidden" name="month" value="{{ month }}">
+                    <button type="submit">Show Month</button>
+                </form>
+            {% else %}
+                <form method="get" action="{{ url_for('index') }}" style="display:inline;">
+                    <input type="hidden" name="year" value="{{ (month == 1) and (year - 1) or year }}">
+                    <input type="hidden" name="month" value="{{ (month == 1) and 12 or (month - 1) }}">
+                    <button type="submit">&lt; Previous</button>
+                </form>
+                <span style="font-weight:bold;">{{ summary.month }}</span>
+                <form method="get" action="{{ url_for('index') }}" style="display:inline;">
+                    <input type="hidden" name="year" value="{{ (month == 12) and (year + 1) or year }}">
+                    <input type="hidden" name="month" value="{{ (month == 12) and 1 or (month + 1) }}">
+                    <button type="submit">Next &gt;</button>
+                </form>
+                <form method="get" action="{{ url_for('index') }}" style="display:inline;">
+                    <input type="hidden" name="year" value="{{ year }}">
+                    <input type="hidden" name="view" value="year">
+                    <button type="submit">Show Year Total</button>
+                </form>
+            {% endif %}
+        </div>
+        <div>
+            Earnings: <span class="summary-positive">{{ summary.earnings }}</span> |
+            Costs: <span class="summary-negative">{{ summary.costs }}</span> |
+            Total: 
+            {% if summary.total >= 0 %}
+                <span class="summary-positive">{{ summary.total }}</span>
+            {% else %}
+                <span class="summary-negative">{{ summary.total }}</span>
+            {% endif %}
+        </div>
+        <canvas id="summaryChart" width="400" height="200"></canvas>
+
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('entries')">Entries</div>
+            <div class="tab" onclick="showTab('add')">Add Entry</div>
+        </div>
+
+        <div id="entries" class="tab-content active">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Comments</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in entries %}
+                    <tr>
+                        <td>{{ entry.date }}</td>
+                        <td>{{ entry.amount }}</td>
+                        <td>{{ entry.comments }}</td>
+                        <td>
+                            <a href="{{ url_for('edit_entry', idx=loop.index0) }}" class="btn-blue edit-btn">Edit</a>
+                            <form action="{{ url_for('delete_entry', idx=loop.index0) }}" method="post" style="display:inline;">
+                                <button type="submit" onclick="return confirm('Delete this entry?');">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div id="add" class="tab-content">
+            <form id="multiEntryForm" action="{{ url_for('add_entry') }}" method="POST">
+                <div id="entryFields">
+                    <div class="entry-group">
+                        <label>Date:</label>
+                        <input type="date" name="date[]" required>
+                        <label>Amount:</label>
+                        <input type="number" name="amount[]" step="0.01" required>
+                        <label>Comments:</label>
+                        <input type="text" name="comments[]">
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button type="button" class="btn-green" onclick="addEntryFields()">+ Add Another Entry</button>
+                    <button type="submit" class="btn-blue">Add Entry</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        // Tab logic
+        function showTab(tabId) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+            // Activate the clicked tab
+            if (tabId === 'entries') {
+                document.querySelectorAll('.tab')[0].classList.add('active');
+            } else {
+                document.querySelectorAll('.tab')[1].classList.add('active');
+            }
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        // Chart.js logic
+        const ctx = document.getElementById('summaryChart').getContext('2d');
+        const summaryChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Earnings', 'Costs', 'Total'],
+                datasets: [{
+                    label: 'This Month',
+                    data: [
+                        {{ summary.earnings }},
+                        {{ summary.costs }},
+                        {{ summary.total }}
+                    ],
+                    backgroundColor: [
+                        '#2ecc40',
+                        '#e74c3c',
+                        '{{ "#2ecc40" if summary.total >= 0 else "#e74c3c" }}'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+
+        // Add multiple entry fields logic
+        function addEntryFields() {
+            const entryGroup = document.createElement('div');
+            entryGroup.className = 'entry-group';
+            entryGroup.innerHTML = `
+                <label>Date:</label>
+                <input type="date" name="date[]" required>
+                <label>Amount:</label>
+                <input type="number" name="amount[]" step="0.01" required>
+                <label>Comments:</label>
+                <input type="text" name="comments[]">
+                <button type="button" class="btn-red" onclick="removeEntryFields(this)">Remove</button>
+            `;
+            document.getElementById('entryFields').appendChild(entryGroup);
+        }
+
+        function removeEntryFields(btn) {
+            btn.parentElement.remove();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,236 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+.container {
+    width: 90%;
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+input[type="date"],
+input[type="number"],
+textarea {
+    margin: 10px 0;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button {
+    padding: 10px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #218838;
+}
+
+.entry-list {
+    margin-top: 20px;
+}
+
+.entry-item {
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+.entry-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    width: 100%;
+    flex-wrap: nowrap; /* Prevent wrapping on desktop */
+}
+
+.entry-group label {
+    margin-right: 6px;
+    white-space: nowrap;
+}
+
+.entry-group input[type="date"],
+.entry-group input[type="number"],
+.entry-group input[type="text"] {
+    margin: 0 6px 0 0;
+    padding: 6px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: auto;
+    flex: 0 1 120px; /* Adjust width as needed */
+    min-width: 80px;
+}
+
+.entry-group button.btn-red {
+    margin-left: 6px;
+    flex-shrink: 0;
+}
+
+/* Only stack vertically on small screens */
+@media (max-width: 600px) {
+    .entry-group {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+    }
+    .entry-group input,
+    .entry-group button,
+    .entry-group label {
+        margin: 4px 0;
+        width: 100%;
+        min-width: 0;
+    }
+}
+
+@media (max-width: 600px) {
+    .container {
+        width: 95%;
+    }
+
+    h1 {
+        font-size: 1.5em;
+    }
+
+    button {
+        font-size: 0.9em;
+    }
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1em;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 12px 10px;
+    text-align: left;
+}
+
+th {
+    background: #f5f5f5;
+    font-weight: bold;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+tr:nth-child(even) {
+    background: #fafafa;
+}
+
+tr:hover {
+    background: #eaf6ff;
+}
+
+td:last-child {
+    white-space: nowrap;
+}
+
+a, button {
+    margin-right: 6px;
+}
+
+form[method="post"] button {
+    background: #e74c3c;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 10px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+form[method="post"] button:hover {
+    background: #c0392b;
+}
+
+form button.btn-green {
+    background: #27ae60;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 14px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background 0.2s;
+}
+form button.btn-green:hover {
+    background: #219150;
+}
+
+a.btn-blue, .btn-blue {
+    background: #2980d9;
+    color: #fff !important;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 14px;
+    cursor: pointer;
+    font-size: 1em;
+    text-decoration: none;
+    display: inline-block;
+    transition: background 0.2s;
+}
+a.btn-blue:hover, .btn-blue:hover {
+    background: #2063a6;
+}
+
+form button.btn-red {
+    background: #e74c3c;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 14px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background 0.2s;
+}
+form button.btn-red:hover {
+    background: #c0392b;
+}
+
+/* New styles for dynamic entry fields */
+#entryFields {
+    margin-top: 20px;
+}
+
+.entry-group label {
+    margin-right: 10px;
+    white-space: nowrap;
+}
+
+button.btn-red {
+    background: #e74c3c;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 10px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+button.btn-red:hover {
+    background: #c0392b;
+}
+
+#multiEntryForm {
+    display: block;
+}
