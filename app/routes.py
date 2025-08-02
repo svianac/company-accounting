@@ -109,9 +109,6 @@ def add_entry():
 @app.route('/edit/<int:idx>', methods=['GET', 'POST'])
 def edit_entry(idx):
     entries = load_entries()
-    if idx < 0 or idx >= len(entries):
-        flash("Entry not found.")
-        return redirect(url_for('index'))
     entry = entries[idx]
     if request.method == 'POST':
         entry['date'] = request.form['date']

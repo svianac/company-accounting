@@ -91,10 +91,7 @@
                         <td>{{ entry.amount }}</td>
                         <td>{{ entry.comments }}</td>
                         <td>
-                            <a href="{{ url_for('edit_entry', idx=loop.index0) }}" class="btn-blue edit-btn">Edit</a>
-                            <form action="{{ url_for('delete_entry', idx=loop.index0) }}" method="post" style="display:inline;">
-                                <button type="submit" onclick="return confirm('Delete this entry?');">Delete</button>
-                            </form>
+                        <button class="btn-icon" onclick="window.location='{{ url_for('edit_entry', idx=loop.index0) }}'" aria-label="Edit Entry">⚙️</button>
                         </td>
                     </tr>
                     {% endfor %}
@@ -115,8 +112,8 @@
                     </div>
                 </div>
                 <div style="display: flex; gap: 10px; margin-top: 10px;">
-                    <button type="button" class="btn-green" onclick="addEntryFields()">+ Add Another Entry</button>
                     <button type="submit" class="btn-blue">Add Entry</button>
+                    <button type="button" class="btn-green" onclick="addEntryFields()">+ Add Another Entry</button>
                 </div>
             </form>
         </div>

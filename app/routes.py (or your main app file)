@@ -1,0 +1,8 @@
+@app.route('/edit/<int:idx>', methods=['GET', 'POST'])
+def edit_entry(idx):
+    global entries  # Add this if entries is a global variable
+    entry = entries[idx]
+    if request.method == 'POST':
+        # update entry logic here
+        ...
+    return render_template('edit.html', entry=entry, idx=idx)
