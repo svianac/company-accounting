@@ -4,6 +4,7 @@ import json
 import os
 from datetime import datetime
 from flask import Flask
+import uuid
 
 DATA_FILE = os.path.join(os.path.dirname(__file__), '..', 'data.json')
 
@@ -16,6 +17,14 @@ def load_entries():
 def save_entries(entries):
     with open(DATA_FILE, 'w') as f:
         json.dump(entries, f, indent=2)
+
+def ensure_keys(entries):
+    changed = False
+    for e in entries:
+        if 'key' not in e:
+            e['key'] = uuid.uuid4().hex
+            changed = True
+    return changed
 
 def get_monthly_summary(entries, year, month):
     earnings = 0
@@ -76,6 +85,9 @@ def filter_year(entries, year):
 @app.route('/', methods=['GET'])
 def index():
     entries = load_entries()
+    # ensure every entry has a unique key
+    if ensure_keys(entries):
+        save_entries(entries)
     now = datetime.now()
     year = int(request.args.get('year', now.year))
     month = int(request.args.get('month', now.month))
@@ -96,19 +108,34 @@ def add_entry():
     amounts = request.form.getlist('amount[]')
     comments = request.form.getlist('comments[]')
     entries = load_entries()
+    # ensure existing entries have keys
+    if ensure_keys(entries):
+        save_entries(entries)
     for date, amount, comment in zip(dates, amounts, comments):
         new_entry = {
             'date': date,
             'amount': float(amount),
-            'comments': comment
+            'comments': comment,
+            'key': uuid.uuid4().hex
         }
         entries.append(new_entry)
     save_entries(entries)
     return redirect(url_for('index'))
 
-@app.route('/edit/<int:idx>', methods=['GET', 'POST'])
-def edit_entry(idx):
+@app.route('/edit/<key>', methods=['GET', 'POST'])
+def edit_entry(key):
     entries = load_entries()
+    # ensure keys exist (in case older file)
+    if ensure_keys(entries):
+        save_entries(entries)
+    idx = None
+    for i, e in enumerate(entries):
+        if e.get('key') == key:
+            idx = i
+            break
+    if idx is None:
+        flash('Entry not found.')
+        return redirect(url_for('index'))
     entry = entries[idx]
     if request.method == 'POST':
         entry['date'] = request.form['date']
@@ -116,12 +143,19 @@ def edit_entry(idx):
         entry['comments'] = request.form['comments']
         save_entries(entries)
         return redirect(url_for('index'))
-    return render_template('edit.html', entry=entry, idx=idx)
+    return render_template('edit.html', entry=entry, key=entry.get('key'))
 
-@app.route('/delete/<int:idx>', methods=['POST'])
-def delete_entry(idx):
+@app.route('/delete/<key>', methods=['POST'])
+def delete_entry(key):
     entries = load_entries()
-    if 0 <= idx < len(entries):
+    if ensure_keys(entries):
+        save_entries(entries)
+    idx = None
+    for i, e in enumerate(entries):
+        if e.get('key') == key:
+            idx = i
+            break
+    if idx is not None and 0 <= idx < len(entries):
         entries.pop(idx)
         save_entries(entries)
     return redirect(url_for('index'))
